@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("staff") // admin, manager, staff
+  avatar    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+// Customer Model
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  phoneNumber   String   @unique
+  email         String   @unique
+  hostel        String
+  faculty       String
+  orderHistory  Int      @default(0)
+  totalSpend    Float    @default(0)
+  favoriteVendors String[] @default([])
+  lastOrder     DateTime?
+  status        String   @default("active") // active, inactive
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  orders        Order[]
+  payments      Payment[]
+
+  @@map("customers")
+}
+
+// Vendor Model
+model Vendor {
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  phoneNumber        String   @unique
+  foodType           String
+  location           String
+  ordersCompleted    Int      @default(0)
+  averageOrderValue  Float    @default(0)
+  rating             Float    @default(0)
+  notes              String?
+  status             String   @default("active") // active, inactive, archived
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  orders             Order[]
+
+  @@map("vendors")
+}
+
+// Order Model
+model Order {
+  id                String   @id @default(cuid())
+  orderId           String   @unique
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId        String
+  vendor            Vendor   @relation(fields: [vendorId], references: [id])
+  vendorId          String
+  mealOrdered       String
+  deliveryWindow    String
+  deliveryLocation  String
+  amount            Float
+  paymentStatus     String   @default("pending") // pending, completed, failed, refunded
+  orderStatus       String   @default("pending") // pending, vendor-confirmed, preparing, collected, on-way, delivered, cancelled
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  payment           Payment?
+
+  @@index([customerId])
+  @@index([vendorId])
+  @@index([orderId])
+  @@map("orders")
+}
+
+// Payment Model
+model Payment {
+  id              String   @id @default(cuid())
+  transactionId   String   @unique
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId         String   @unique
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId      String
+  amount          Float
+  method          String   @default("mobile-money") // mobile-money, paystack
+  reference       String?
+  status          String   @default("pending") // pending, completed, failed, refunded
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([transactionId])
+  @@map("payments")
+}
+
+// Delivery Schedule Model
+model DeliverySchedule {
+  id        String   @id @default(cuid())
+  window    String   @unique // e.g., "12:00-12:20"
+  capacity  Int
+  scheduled Int      @default(0)
+  status    String   @default("available") // available, full, closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("delivery_schedules")
+}
+
+// Activity Log Model
+model Activity {
+  id        String   @id @default(cuid())
+  type      String   // order-received, payment-received, vendor-confirmed, meal-collected, order-delivered
+  title     String
+  description String
+  relatedData Json?
+  createdAt DateTime @default(now())
+
+  @@map("activities")
+}
+
+// Automation Model
+model Automation {
+  id        String   @id @default(cuid())
+  name      String
+  trigger   String
+  actions   String[]
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("automations")
+}
