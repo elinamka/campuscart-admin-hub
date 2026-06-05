@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-gold: #F59E0B;
+    --primary-orange: #EA580C;
+    --dark-navy: #0F172A;
+    --dark-charcoal: #1F2937;
+    --white: #FFFFFF;
+    --light-gray: #F8FAFC;
+    --success-green: #22C55E;
+    --warning-amber: #F59E0B;
+    --error-red: #EF4444;
+    --info-blue: #3B82F6;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-orange text-white rounded-lg font-medium transition-all duration-200 hover:bg-orange-600 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-dark-charcoal text-white rounded-lg font-medium transition-all duration-200 hover:bg-dark-navy;
+  }
+
+  .card {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange transition-all;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-success bg-opacity-10 text-success;
+  }
+
+  .badge-error {
+    @apply badge bg-error bg-opacity-10 text-error;
+  }
+}

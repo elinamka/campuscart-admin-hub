@@ -1,0 +1,10 @@
+{
+  "name": "campuscart-admin-hub",
+  "version": "1.0.0",
+  "description": "Investor-ready SaaS admin dashboard for CampusCart meal delivery service",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
